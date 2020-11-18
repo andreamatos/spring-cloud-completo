@@ -1,10 +1,6 @@
 server:
   port: 8081
 
-spring:
-  application:
-    name: 'peixe-classe'
-    
 eureka:
   client:
     fetch-registry: true
