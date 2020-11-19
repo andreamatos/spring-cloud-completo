@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.demo.dto.InfoClassePeixeDTO;
 import com.example.demo.dto.PeixeDTO;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 @Service
 public class PeixeService {
@@ -19,16 +20,33 @@ public class PeixeService {
 	@Autowired
 	private DiscoveryClient eurekaClient;
 
-	public void verificaClassePeixe(PeixeDTO peixe) {
-		
+	@HystrixCommand(fallbackMethod="verificaClassePeixeFallBack")
+	public PeixeDTO verificaClassePeixe(PeixeDTO peixe) {
+		PeixeDTO peixeDTO = new PeixeDTO();
 		ResponseEntity<InfoClassePeixeDTO> exchange = 
 				client
 				.exchange(("http://peixe-classe/classe/" + peixe.getCodigo()), HttpMethod.GET, null, InfoClassePeixeDTO.class);
 		
 		eurekaClient.getInstances("peixe-classe").stream().forEach(peixeClasse -> {
-			System.out.println("localhost:" + peixeClasse.getPort());	
+//			System.out.println("localhost:" + peixeClasse.getPort());	
 		});
 		
-		System.out.println(exchange.getBody().getClassePeixe());
+//		System.out.println(exchange.getBody().getClassePeixe());
+		
+//		try {
+//			Thread.sleep(1000);
+//		}catch(Exception e ){
+//			e.printStackTrace();
+//		}
+		
+		peixeDTO.setNome(exchange.getBody().getNomePeixe());
+		return peixeDTO;
 	}
+	
+	public PeixeDTO verificaClassePeixeFallBack(PeixeDTO peixe) {
+		PeixeDTO peixeDTOFallBack = new PeixeDTO();
+		peixeDTOFallBack.setCodigo(peixe.getCodigo());
+		return peixeDTOFallBack;
+	}
+	
 }

@@ -17,8 +17,8 @@ public class PeixesController {
 	private PeixeService service;
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public void realizarCompra(@RequestBody PeixeDTO peixe) {
-		service.verificaClassePeixe(peixe);
+	public PeixeDTO realizarCompra(@RequestBody PeixeDTO peixe) {
+		return service.verificaClassePeixe(peixe);
 	}
 
 }
